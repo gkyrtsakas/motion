@@ -9,8 +9,8 @@ cap = cv2.VideoCapture('Highway3.mp4')
 
 # params for ShiTomasi corner detection
 feature_params = dict( maxCorners = 100,
-                       qualityLevel = 0.4,
-                       minDistance = 10,
+                       qualityLevel = 0.3,
+                       minDistance = 15,
                        blockSize = 7 )
 
 # Parameters for lucas kanade optical flow
@@ -21,7 +21,7 @@ lk_params = dict( winSize  = (15,15),
 
 color = (0,255,0)
 
-mog = cv2.BackgroundSubtractorMOG()
+mog = cv2.BackgroundSubtractorMOG2(30, 196, True)
 
 def findGoodFeatures (old_gray):
     # ret, old_frame = cap.read()
@@ -48,6 +48,7 @@ while p0 is None:
 
 # Create a mask image for drawing purposes
 mask = np.zeros_like(old_frame)
+weighted = np.float32(old_frame)
 # newHist = oldHist
 
 
@@ -64,6 +65,7 @@ while(1):
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     frame_gray  = mog.apply(frame)
+    cv2.accumulateWeighted(frame, weighted, 0.01)
     # pdb.set_trace()
     enter_left = frame_gray[:,0]
     enter_right = frame_gray[:,frame.shape[1]-1]
@@ -120,7 +122,8 @@ while(1):
     #print type(mask)
     img = cv2.add(frame,mask)
 
-    cv2.imshow('frame',img)
+    cv2.imshow('mog',old_gray)
+    cv2.imshow('hybrid',img)
     # print frame_gray.shape
     
     k = cv2.waitKey(1)
