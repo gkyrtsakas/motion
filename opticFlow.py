@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-cap = cv2.VideoCapture('backSubOut.mp4')
+cap = cv2.VideoCapture('Highway3.mp4')
 #cap = cv2.VideoCapture('footage3.mp4')
 
 # params for ShiTomasi corner detection
