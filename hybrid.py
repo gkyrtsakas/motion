@@ -4,6 +4,7 @@ import pdb
 import time
 
 cap = cv2.VideoCapture('Highway3.mp4')
+# cap = cv2.VideoCapture(0)
 
 # params for ShiTomasi corner detection
 feature_params = dict( maxCorners = 100,
@@ -16,7 +17,7 @@ lk_params = dict( winSize  = (15,15),
                   maxLevel = 3,
                   criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 30, 0.01))
 
-mog = cv2.BackgroundSubtractorMOG2(30, 196, True)
+mog = cv2.BackgroundSubtractorMOG2(5, 196, True)
 
 
 # Take first frame and find corners in it
@@ -34,7 +35,6 @@ while p0 is None:
 # Create a mask image for drawing purposes
 mask = np.zeros_like(old_frame)
 weighted = np.float32(old_frame)
-# newHist = oldHist
 
 
 while(1):
@@ -48,14 +48,14 @@ while(1):
     frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     frame_gray  = mog.apply(frame)
-    cv2.accumulateWeighted(frame, weighted, 0.1)
     
     p0 = cv2.goodFeaturesToTrack(old_gray, mask = None, **feature_params)
 
     while p0 is None:    
         ret, old_frame = cap.read()
         mog_image  = mog.apply(old_frame)
-        p0, old_gray = findGoodFeatures (mog_image)
+        p0 = cv2.goodFeaturesToTrack(old_gray, mask = None, **feature_params)
+
 
     
     p1, st, err = cv2.calcOpticalFlowPyrLK(old_gray, frame_gray, p0, None, **lk_params)
