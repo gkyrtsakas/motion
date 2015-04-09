@@ -6,7 +6,13 @@ def diffImg(t0, t1, t2):
   return cv2.absdiff(d2,d1)
   #return cv2.bitwise_and(d1, d2)
 
-cam = cv2.VideoCapture('footage3.mp4')
+fps = 30
+capSize = (960,540)
+fourcc = cv2.cv.CV_FOURCC('m','p','4','v')
+vidWrite = cv2.VideoWriter()
+success = vidWrite.open('tempDiff.mp4',fourcc,fps,capSize,True)
+
+cam = cv2.VideoCapture('Highway5.mp4')
 
 winName = "Movement Indicator"
 cv2.namedWindow(winName, cv2.CV_WINDOW_AUTOSIZE)
@@ -17,8 +23,7 @@ t = cv2.cvtColor(cam.read()[1], cv2.COLOR_RGB2GRAY)
 t_plus = cv2.cvtColor(cam.read()[1], cv2.COLOR_RGB2GRAY)
 
 while True:
-  cv2.imshow( winName, diffImg(t_minus, t, t_plus) )
-
+  vidWrite.write(cv2.cvtColor(diffImg(t_minus, t, t_plus), cv2.COLOR_GRAY2RGB) )
   # Read next image
   t_minus = t
   t = t_plus
@@ -29,4 +34,5 @@ while True:
     cv2.destroyWindow(winName)
     break
 
-print "Goodbye"
+
+vidWrite.release()
