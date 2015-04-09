@@ -3,8 +3,14 @@ import cv2
 import pdb
 import time
 
-cap = cv2.VideoCapture('Highway3.mp4')
+cap = cv2.VideoCapture('Highway5.mp4')
 # cap = cv2.VideoCapture(0)
+
+fps = 30
+capSize = (960,540)
+fourcc = cv2.cv.CV_FOURCC('m','p','4','v')
+vidWrite = cv2.VideoWriter()
+success = vidWrite.open('backSub.mp4',fourcc,fps,capSize,True)
 
 # params for ShiTomasi corner detection
 feature_params = dict( maxCorners = 100,
@@ -54,7 +60,7 @@ while(1):
     while p0 is None:    
         ret, old_frame = cap.read()
         mog_image  = mog.apply(old_frame)
-        p0 = cv2.goodFeaturesToTrack(old_gray, mask = None, **feature_params)
+        p0 = cv2.goodFeaturesToTrack(mog_image, mask = None, **feature_params)
 
 
     
@@ -68,16 +74,14 @@ while(1):
     for i,(new,old) in enumerate(zip(good_new,good_old)):
         a,b = new.ravel()
         c,d = old.ravel()
-        # if (abs(a-c) > 0.1 and abs(b-d) > 0.1):
-
-        # cv2.line(mask, (a,b),(c,d), color[i].tolist(), 2)
         cv2.circle(frame,(a,b),5,(0,255,0),-1)
     
 
     img = cv2.add(frame,mask)
 
-    cv2.imshow('mog',old_gray)
+    # cv2.imshow('mog',old_gray)
     cv2.imshow('hybrid',img)
+    # vidWrite.write(cv2.cvtColor(old_gray, cv2.COLOR_GRAY2BGR))
     # print frame_gray.shape
     
     k = cv2.waitKey(1)
@@ -90,6 +94,6 @@ while(1):
     
     
    
-
+vidWrite.release()
 cv2.destroyAllWindows()
 cap.release()
